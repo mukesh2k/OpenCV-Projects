@@ -26,6 +26,8 @@ class handDetector():
 
     def findposition(self,img,handNumber=0,draw=True):
         lmList=[]
+        imgRGB = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+        self.results = self.hands.process(imgRGB)
         if  self.results.multi_hand_landmarks:
             cx=self.results.multi_hand_landmarks[handNumber]
             for id,lm in enumerate(cx.landmark):
