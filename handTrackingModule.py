@@ -11,7 +11,9 @@ class handDetector():
         self.mphand=mp.solutions.hands
         self.hands=self.mphand.Hands(self.mode,self.maxHands, self.detectconfi, self.trackconfi)
         self.mpDraw=mp.solutions.drawing_utils
-
+        self.tipid=[8,12,16,20]
+        self.lisy=[]
+        self.imgRGB=[]
     def findHand(self,img,draw=True):
         imgRGB=cv2.cvtColor(img,cv2.COLOR_BGR2RGB)
         self.results=self.hands.process(imgRGB)
@@ -26,8 +28,8 @@ class handDetector():
 
     def findposition(self,img,handNumber=0,draw=True):
         lmList=[]
-        imgRGB = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-        self.results = self.hands.process(imgRGB)
+        self.imgRGB = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+        self.results = self.hands.process(self.imgRGB)
         if  self.results.multi_hand_landmarks:
             cx=self.results.multi_hand_landmarks[handNumber]
             for id,lm in enumerate(cx.landmark):
@@ -35,9 +37,17 @@ class handDetector():
                 h,w,c=img.shape
                 px,py=int (lm.x*w),int (lm.y*h)
                 lmList.append([id,px,py])
+        self.lisy=lmList
         return lmList
 
-
+    def opencheck(self):
+        lists = self.lisy
+        state=[]
+        if len(lists) != 0:
+            state.append(lists[4][1] > lists[3][1])
+            for x in self.tipid:
+                state.append(lists[x][2] < lists[x - 2][2])  # true open
+        return state
 
 def main():
     pTime = 0
